@@ -35,7 +35,7 @@ public class UsuarioController {
                     @ApiResponse(responseCode = "500", description = "Foi gerada uma exceção")
             }
     )
-    @PostMapping
+    @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDTO login) {
         String user = (usuarioService.post(login));
         return new ResponseEntity<>(user, HttpStatus.OK);
