@@ -14,6 +14,4 @@ public interface UsuarioClient {
 
     @RequestLine("POST /token")
     TokenDTO post(LoginDTO loginDTO);
-
-
 }

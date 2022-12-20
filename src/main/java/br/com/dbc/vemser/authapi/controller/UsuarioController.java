@@ -30,7 +30,7 @@ public class UsuarioController {
             }
     )
     @PostMapping
-    public ResponseEntity<String> create(@RequestBody LoginDTO login) {
+    public ResponseEntity<String> login(@RequestBody LoginDTO login) {
         String user = (usuarioService.post(login));
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
