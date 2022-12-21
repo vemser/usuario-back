@@ -21,6 +21,19 @@ import java.util.List;
 public class UsuarioController {
     private final UsuarioService usuarioService;
 
+    @Operation(summary = "Buscar usuário logado", description = "Busca o usuário que está logado no sistema")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Busca do usuário logado realizada com sucesso"),
+                    @ApiResponse(responseCode = "403", description = "Você não tem permissão para acessar este recurso"),
+                    @ApiResponse(responseCode = "500", description = "Foi gerada uma exceção")
+            }
+    )
+    @GetMapping("/logged-user")
+    public ResponseEntity <UsuarioDTO> getLoggedUser() throws RegraDeNegocioException {
+        return new ResponseEntity<>(usuarioService.buscarUsuarioLogado(), HttpStatus.OK);
+    }
+
     @Operation(summary = "Realizar login", description = "Realiza o login do usuário")
     @ApiResponses(
             value = {
