@@ -24,7 +24,7 @@ public class FotoService {
     public UsuarioDTO uploadImagePerfil(MultipartFile imagem) throws RegraDeNegocioException, IOException {
         Integer idLoggedUser = loginService.getIdLoggedUser();
         if(!imagem.getContentType().startsWith("image") || imagem.getContentType().endsWith("gif")){
-            throw new RegraDeNegocioException("Tipo da imagem invalido.");
+            throw new RegraDeNegocioException("Tipo da imagem inválido!");
         }
         UsuarioEntity usuario = usuarioService.findById(idLoggedUser);
         return salvarUsuarioComFotoDTO(imagem, usuario);

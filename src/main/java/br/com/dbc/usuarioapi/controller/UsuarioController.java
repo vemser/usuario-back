@@ -114,7 +114,7 @@ public class UsuarioController {
                     @ApiResponse(responseCode = "500", description = "Foi gerada uma exceção")
             }
     )
-    @GetMapping("/filtrarLoginCargo")
+    @GetMapping("/filtro-login-cargo")
     public ResponseEntity<PageDTO<UsuarioDTO>> filtrarLoginCargo(Integer pagina, Integer tamanho,
                                                                  @Valid @RequestParam(name = "login", required = false) String login,
                                                                  @Valid @RequestParam(name = "nomeCargo", required = false) String nomeCargo){
