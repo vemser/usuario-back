@@ -9,14 +9,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/usuario")
+@Validated
 @RequiredArgsConstructor
 public class UsuarioController {
     private final UsuarioService usuarioService;
@@ -43,7 +43,7 @@ public class UsuarioController {
             }
     )
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDTO login) throws RegraDeNegocioException {
+    public ResponseEntity<String> login(@Valid @RequestBody LoginDTO login) throws RegraDeNegocioException {
         String user = (usuarioService.post(login));
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -116,8 +116,8 @@ public class UsuarioController {
     )
     @GetMapping("/filtrarLoginCargo")
     public ResponseEntity<PageDTO<UsuarioDTO>> filtrarLoginCargo(Integer pagina, Integer tamanho,
-                                                                 @RequestParam(name = "login", required = false) String login,
-                                                                 @RequestParam(name = "nomeCargo", required = false) String nomeCargo){
+                                                                 @Valid @RequestParam(name = "login", required = false) String login,
+                                                                 @Valid @RequestParam(name = "nomeCargo", required = false) String nomeCargo){
         return ResponseEntity.ok(usuarioService.filtrar(pagina,tamanho,login,nomeCargo));
     }
 }
