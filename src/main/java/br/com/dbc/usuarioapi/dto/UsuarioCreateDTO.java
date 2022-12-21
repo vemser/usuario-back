@@ -19,5 +19,5 @@ public class UsuarioCreateDTO {
     @NotNull
     @NotEmpty
     @Schema(description = "Lista de cargos do usuário")
-    private Set<CargoDTO> cargos;
+    private Set<CargoCreateDTO> cargos;
 }

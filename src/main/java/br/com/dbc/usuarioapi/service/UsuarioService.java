@@ -15,10 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -37,7 +34,8 @@ public class UsuarioService {
         if (login.getUsername().trim().contains("@dbccompany.com.br")) {
             login.setUsername(login.getUsername().trim().replace("@dbccompany.com.br", ""));
         }
-        TokenDTO token = (usuarioClient.post(login));
+        CredenciaisDTO credenciaisDTO = gerarCredenciais(login);
+        TokenDTO token = (usuarioClient.post(credenciaisDTO));
         UsuarioEntity usuarioEntity;
         try {
             usuarioEntity = findByLogin(token.getUsername());
@@ -65,9 +63,19 @@ public class UsuarioService {
         );
     }
 
-    public UsuarioDTO create(UsuarioCreateDTO usuarioCreateDTO) {
-        if (usuarioCreateDTO.getLogin().trim().contains("@dbccompany.com.br")) {
-            usuarioCreateDTO.setLogin(usuarioCreateDTO.getLogin().trim().replace("@dbccompany.com.br", ""));
+    public UsuarioDTO create(UsuarioCreateDTO usuarioCreateDTO) throws RegraDeNegocioException {
+        if(usuarioCreateDTO.getLogin().trim().contains("@")) {
+            if (usuarioCreateDTO.getLogin().trim().endsWith("@dbccompany.com.br")) {
+                usuarioCreateDTO.setLogin(usuarioCreateDTO.getLogin().trim().replace("@dbccompany.com.br", ""));
+            } else {
+                throw new RegraDeNegocioException("Login informado não segue o padrão @dbccompany.com.br");
+            }
+        }
+        Optional<UsuarioEntity> byLogin = usuarioRepository.findByLogin(usuarioCreateDTO.getLogin());
+        if (byLogin.isPresent()) {
+            throw new RegraDeNegocioException("Login informado já existe!");
+        }else if (!cargoValido(usuarioCreateDTO.getCargos())){
+            throw new RegraDeNegocioException("Insira um cargo válido!");
         }
         UsuarioEntity usuarioEntity = new UsuarioEntity();
         usuarioEntity.setLogin(usuarioCreateDTO.getLogin());
@@ -147,5 +155,15 @@ public class UsuarioService {
         FotoEntity foto = usuario.getFoto();
         usuarioDTO.setImagem(foto == null ? null : foto.getArquivo());
         return usuarioDTO;
+    }
+
+    private CredenciaisDTO gerarCredenciais (LoginDTO login) {
+        CredenciaisDTO credenciais = new CredenciaisDTO();
+        credenciais.setClient_id("ECOS-Client");
+        credenciais.setClient_secret("DBC-ECOS");
+        credenciais.setGrant_type("password");
+        credenciais.setUsername(login.getUsername());
+        credenciais.setPassword(login.getPassword());
+        return credenciais;
     }
 }

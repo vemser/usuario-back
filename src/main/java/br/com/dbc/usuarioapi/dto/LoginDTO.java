@@ -2,18 +2,17 @@ package br.com.dbc.usuarioapi.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 @Data
 public class LoginDTO {
-
-
-    private String client_id;
-
-    private String client_secret;
-
-    private String grant_type;
-
+    @NotNull
+    @NotBlank
     private String username;
 
+    @NotNull
+    @NotBlank
     private String password;
 
 }

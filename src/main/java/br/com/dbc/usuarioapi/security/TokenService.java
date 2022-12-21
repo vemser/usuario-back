@@ -20,24 +20,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TokenService {
 
-    private static final String CHAVE_CARGOS = "CARGOS";
-    private static final int VALIDADE_TOKEN_TRINTA_DIAS = 30;
+    private static final String CHAVE_CARGOS = "cargos";
+    private static final String CHAVE_USERNAME = "username";
 
     @Value("${jwt.secret}")
     private String secret;
 
+    @Value("${jwt.expiration}")
+    private int expiration;
+
     public String getToken(UsuarioEntity usuarioEntity) {
 
-        LocalDateTime localDateExpiration = LocalDateTime.now().plusDays(VALIDADE_TOKEN_TRINTA_DIAS);
+        LocalDateTime localDateExpiration = LocalDateTime.now().plusDays(expiration);
         Date dateExpiration = Date.from(localDateExpiration.atZone(ZoneId.systemDefault()).toInstant());
-
 
         List<String> cargosDoUsuario = usuarioEntity.getCargos().stream()
                 .map(CargoEntity::getAuthority)
                 .toList();
 
         return Jwts.builder()
-                .setIssuer("chronos-api")
+                .claim(CHAVE_USERNAME, usuarioEntity.getUsername())
                 .claim(Claims.ID, usuarioEntity.getIdUsuario().toString())
                 .claim(CHAVE_CARGOS, cargosDoUsuario)
                 .setIssuedAt(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()))
