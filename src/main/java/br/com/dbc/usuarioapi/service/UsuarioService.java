@@ -28,7 +28,13 @@ public class UsuarioService {
     private final CargoService cargoService;
     private final UsuarioClient usuarioClient;
     private final TokenService tokenService;
+    private final LoginService loginService;
 
+    public UsuarioDTO buscarUsuarioLogado() throws RegraDeNegocioException {
+        UsuarioDTO loggedUser = loginService.getLoggedUser();
+        UsuarioEntity usuarioEntity = findById(loggedUser.getIdUsuario());
+        return toDto(usuarioEntity);
+    }
 
     public String post(LoginDTO login) throws RegraDeNegocioException {
         String loginValidado = validarLogin(login.getUsername());
