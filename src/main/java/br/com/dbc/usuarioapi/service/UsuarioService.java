@@ -11,6 +11,7 @@ import br.com.dbc.usuarioapi.security.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,13 @@ public class UsuarioService {
     private final CargoService cargoService;
     private final UsuarioClient usuarioClient;
     private final TokenService tokenService;
+    private final LoginService loginService;
 
+    public UsuarioDTO buscarUsuarioLogado() throws RegraDeNegocioException {
+        UsuarioDTO loggedUser = loginService.getLoggedUser();
+        UsuarioEntity usuarioEntity = findById(loggedUser.getIdUsuario());
+        return toDto(usuarioEntity);
+    }
 
     public String post(LoginDTO login) throws RegraDeNegocioException {
         String loginValidado = validarLogin(login.getUsername());
@@ -172,5 +179,40 @@ public class UsuarioService {
         credenciais.setUsername(login.getUsername());
         credenciais.setPassword(login.getPassword());
         return credenciais;
+    }
+
+    public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, String login, String nomeCargo){
+        PageRequest pageRequest = PageRequest.of(pagina, tamanho);
+
+
+        Page<UsuarioEntity> usuarioEntityPage = usuarioRepository
+                .findAllByFiltro(pageRequest, login, nomeCargo);
+
+        List<UsuarioDTO> usuarioDTOList = getUsuarioDtos(usuarioEntityPage);
+
+        return new PageDTO<>(usuarioEntityPage.getTotalElements(),
+                usuarioEntityPage.getTotalPages(),
+                pagina,
+                tamanho,
+                usuarioDTOList);
+
+    }
+
+
+    @NotNull
+    private List<UsuarioDTO> getUsuarioDtos(Page<UsuarioEntity> usuarioEntities) {
+        List<UsuarioDTO> usuarioDTOList = usuarioEntities
+                .getContent().stream()
+                .map(usuarioEntity -> {
+                            UsuarioDTO usuarioDTO = objectMapper.convertValue(usuarioEntity, UsuarioDTO.class);
+
+                            usuarioDTO.setCargos(usuarioEntity.getCargos().stream()
+                                    .map(cargo -> objectMapper.convertValue(cargo, CargoDTO.class))
+                                    .collect(Collectors.toSet()));
+
+                            return usuarioDTO;
+                        })
+                .collect(Collectors.toList());
+        return usuarioDTOList;
     }
 }
