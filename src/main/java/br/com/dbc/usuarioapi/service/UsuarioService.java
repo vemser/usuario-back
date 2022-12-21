@@ -31,19 +31,11 @@ public class UsuarioService {
 
 
     public String post(LoginDTO login) throws RegraDeNegocioException {
-//        if (login.getUsername().trim().contains("@dbccompany.com.br")) {
-//            login.setUsername(login.getUsername().trim().replace("@dbccompany.com.br", ""));
-//        }
         String loginValidado = validarLogin(login.getUsername());
         login.setUsername(loginValidado);
 
         CredenciaisDTO credenciaisDTO = gerarCredenciais(login);
-        ResponseEcosDTO response;
-        try {
-            response = (usuarioClient.post(credenciaisDTO));
-        }catch(Exception e) {
-            throw new RegraDeNegocioException("login e senha inválidos!");
-        }
+        ResponseEcosDTO response = (usuarioClient.post(credenciaisDTO));
         UsuarioEntity usuarioEntity;
         try {
             usuarioEntity = findByLogin(response.getUsername());

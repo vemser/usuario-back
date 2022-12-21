@@ -20,7 +20,11 @@ public class SimpleErrorDecode implements ErrorDecoder {
             String bodyString = IOUtils.toString(body.asInputStream());
             switch (response.status()) {
                 case 400:
-                    return new RegraDeNegocioException(bodyString);
+//                    return new RegraDeNegocioException(bodyString);
+                    return new RegraDeNegocioException("login e senha inválidos!");
+                case 401:
+//                    return new RegraDeNegocioException(bodyString);
+                    return new RegraDeNegocioException("login e senha inválidos!");
                 default:
                     return new Exception(bodyString);
             }
