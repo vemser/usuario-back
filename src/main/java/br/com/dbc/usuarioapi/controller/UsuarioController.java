@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @RestController
@@ -90,5 +91,20 @@ public class UsuarioController {
         UsuarioDTO usuarioDTO = usuarioService.updateCargos(idUsuario, cargoUpdateDTO);
 
         return new ResponseEntity<>(usuarioDTO, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Filtar por login e cargo", description = "Filtar por login e cargo do usuário")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Cargos atualizados com sucesso"),
+                    @ApiResponse(responseCode = "403", description = "Você não tem permissão para acessar este recurso"),
+                    @ApiResponse(responseCode = "500", description = "Foi gerada uma exceção")
+            }
+    )
+    @GetMapping("/filtrarLoginCargo")
+    public ResponseEntity<PageDTO<UsuarioDTO>> filtrarLoginCargo(Integer pagina, Integer tamanho,
+                                                                 @RequestParam(name = "login", required = false) String login,
+                                                                 @RequestParam(name = "nomeCargo", required = false) String nomeCargo){
+        return ResponseEntity.ok(usuarioService.filtrar(pagina,tamanho,login,nomeCargo));
     }
 }
