@@ -165,7 +165,7 @@ public class UsuarioServiceTest {
         String senhaCriptografada = "$oieufr9873he4j809fy43";
         UsuarioCreateDTO usuarioCreate = getUsuarioCreateDTO();
 
-        when(passwordEncoder.encode(anyString())).thenReturn(senhaCriptografada);
+
         when(usuarioRepository.save(any())).thenReturn(getUsuarioEntity());
 
         // ACT
