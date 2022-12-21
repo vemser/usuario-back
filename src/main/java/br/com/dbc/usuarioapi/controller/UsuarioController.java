@@ -29,7 +29,7 @@ public class UsuarioController {
             }
     )
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDTO login) {
+    public ResponseEntity<String> login(@RequestBody LoginDTO login) throws RegraDeNegocioException {
         String user = (usuarioService.post(login));
         return new ResponseEntity<>(user, HttpStatus.OK);
     }

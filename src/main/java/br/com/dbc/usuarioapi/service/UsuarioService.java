@@ -30,12 +30,20 @@ public class UsuarioService {
     private final TokenService tokenService;
 
 
-    public String post(LoginDTO login) {
-        if (login.getUsername().trim().contains("@dbccompany.com.br")) {
-            login.setUsername(login.getUsername().trim().replace("@dbccompany.com.br", ""));
-        }
+    public String post(LoginDTO login) throws RegraDeNegocioException {
+//        if (login.getUsername().trim().contains("@dbccompany.com.br")) {
+//            login.setUsername(login.getUsername().trim().replace("@dbccompany.com.br", ""));
+//        }
+        String loginValidado = validarLogin(login.getUsername());
+        login.setUsername(loginValidado);
+
         CredenciaisDTO credenciaisDTO = gerarCredenciais(login);
-        TokenDTO token = (usuarioClient.post(credenciaisDTO));
+        TokenDTO token;
+        try {
+            token = (usuarioClient.post(credenciaisDTO));
+        }catch(Exception e) {
+            throw new RegraDeNegocioException("login e senha inválidos!");
+        }
         UsuarioEntity usuarioEntity;
         try {
             usuarioEntity = findByLogin(token.getUsername());
@@ -64,13 +72,9 @@ public class UsuarioService {
     }
 
     public UsuarioDTO create(UsuarioCreateDTO usuarioCreateDTO) throws RegraDeNegocioException {
-        if(usuarioCreateDTO.getLogin().trim().contains("@")) {
-            if (usuarioCreateDTO.getLogin().trim().endsWith("@dbccompany.com.br")) {
-                usuarioCreateDTO.setLogin(usuarioCreateDTO.getLogin().trim().replace("@dbccompany.com.br", ""));
-            } else {
-                throw new RegraDeNegocioException("Login informado não segue o padrão @dbccompany.com.br");
-            }
-        }
+        String loginValidado = validarLogin(usuarioCreateDTO.getLogin());
+        usuarioCreateDTO.setLogin(loginValidado);
+
         Optional<UsuarioEntity> byLogin = usuarioRepository.findByLogin(usuarioCreateDTO.getLogin());
         if (byLogin.isPresent()) {
             throw new RegraDeNegocioException("Login informado já existe!");
@@ -157,7 +161,18 @@ public class UsuarioService {
         return usuarioDTO;
     }
 
-    private CredenciaisDTO gerarCredenciais (LoginDTO login) {
+    private String validarLogin(String login) throws RegraDeNegocioException {
+        if(login.trim().contains("@")) {
+            if (login.trim().endsWith("@dbccompany.com.br")) {
+                login = login.trim().replace("@dbccompany.com.br", "");
+            } else {
+                throw new RegraDeNegocioException("Login informado não segue o padrão @dbccompany.com.br");
+            }
+        }
+        return login;
+    }
+
+    private CredenciaisDTO gerarCredenciais(LoginDTO login) {
         CredenciaisDTO credenciais = new CredenciaisDTO();
         credenciais.setClient_id("ECOS-Client");
         credenciais.setClient_secret("DBC-ECOS");
