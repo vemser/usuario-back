@@ -29,7 +29,6 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final ObjectMapper objectMapper;
     private final CargoService cargoService;
-    private final LoginService loginService;
     private final UsuarioClient usuarioClient;
     private final TokenService tokenService;
 
@@ -66,15 +65,12 @@ public class UsuarioService {
         );
     }
 
-    public UsuarioDTO buscarUsuarioLogado() throws RegraDeNegocioException {
-        UsuarioDTO loggedUser = loginService.getLoggedUser();
-        UsuarioEntity usuarioEntity = findById(loggedUser.getIdUsuario());
-        return toDto(usuarioEntity);
-    }
-
-    public UsuarioDTO create(UsuarioCreateDTO usuarioCreateDTO) throws RegraDeNegocioException {
-
+    public UsuarioDTO create(UsuarioCreateDTO usuarioCreateDTO) {
+        if (usuarioCreateDTO.getLogin().trim().contains("@dbccompany.com.br")) {
+            usuarioCreateDTO.setLogin(usuarioCreateDTO.getLogin().trim().replace("@dbccompany.com.br", ""));
+        }
         UsuarioEntity usuarioEntity = new UsuarioEntity();
+        usuarioEntity.setLogin(usuarioCreateDTO.getLogin());
 
         Set<CargoEntity> cargos = usuarioCreateDTO.getCargos().stream()
                 .map(cargo -> cargoService.findByNome(cargo.getNome())).collect(Collectors.toSet());
@@ -85,24 +81,22 @@ public class UsuarioService {
         return usuarioDTO;
     }
 
-//    public UsuarioDTO updatePerfil(UsuarioUpdateDTO usuarioUpdate) throws RegraDeNegocioException {
-//        Integer idLoggedUser = loginService.getIdLoggedUser();
-//
-//        UsuarioEntity usuarioRecover = findById(idLoggedUser);
-//    }
-
-    public UsuarioDTO updateAdmin(Integer id, UAdminUpdateDTO usuarioUpdate) throws RegraDeNegocioException {
-
-        if (!cargoValido(usuarioUpdate.getCargos())) {
+    public UsuarioDTO updateCargos(Integer id, CargoUpdateDTO cargoUpdate) throws RegraDeNegocioException {
+        if (!cargoValido(cargoUpdate.getCargos())) {
             throw new RegraDeNegocioException("Insira um cargo válido!");
         }
 
         UsuarioEntity usuarioRecover = findById(id);
-        Set<CargoEntity> cargos = usuarioUpdate.getCargos().stream()
+        Set<CargoEntity> cargos = cargoUpdate.getCargos().stream()
                 .map(cargo -> (cargoService.findByNome(cargo.getNome()))).collect(Collectors.toSet());
         usuarioRecover.setCargos(cargos);
 
         return toDto(usuarioRepository.save(usuarioRecover));
+    }
+
+    public void delete(Integer idUsuario) throws RegraDeNegocioException {
+        UsuarioEntity usuarioEntity = this.findById(idUsuario);
+        usuarioRepository.delete(usuarioEntity);
     }
 
     public boolean cargoValido(Set<CargoCreateDTO> cargoEntities) {
@@ -125,12 +119,6 @@ public class UsuarioService {
             }
         }
         return true;
-    }
-
-
-    public void delete(Integer idUsuario) throws RegraDeNegocioException {
-        UsuarioEntity usuarioEntity = this.findById(idUsuario);
-        usuarioRepository.delete(usuarioEntity);
     }
 
     public UsuarioEntity findById(Integer idUsuario) throws RegraDeNegocioException {

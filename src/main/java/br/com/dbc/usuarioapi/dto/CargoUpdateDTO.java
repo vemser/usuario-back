@@ -7,7 +7,7 @@ import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
 @Data
-public class UAdminUpdateDTO {
+public class CargoUpdateDTO {
 
     @NotEmpty
     @Schema(description = "Cargos do usuário")

@@ -19,18 +19,7 @@ public class FotoService {
     private final UsuarioService usuarioService;
     private final FotoRepository fotoRepository;
     private final LoginService loginService;
-
     private final CargoService cargoService;
-
-    public FotoEntity findById(Integer idPerfil) throws RegraDeNegocioException {
-        return fotoRepository.findById(idPerfil)
-                .orElseThrow(() -> new RegraDeNegocioException("Imagem não encontrada!"));
-    }
-
-    public UsuarioDTO uploadImage(Integer idUsuario, MultipartFile imagem) throws RegraDeNegocioException, IOException {
-        UsuarioEntity usuario = usuarioService.findById(idUsuario);
-        return salvarUsuarioComFotoDTO(imagem, usuario);
-    }
 
     public UsuarioDTO uploadImagePerfil(MultipartFile imagem) throws RegraDeNegocioException, IOException {
         Integer idLoggedUser = loginService.getIdLoggedUser();
@@ -57,5 +46,10 @@ public class FotoService {
         usuarioDTO.setCargos(cargoService.toDtos(usuario.getCargos()));
         usuarioDTO.setImagem(fotoSaved.getArquivo());
         return usuarioDTO;
+    }
+
+    public FotoEntity findById(Integer idPerfil) throws RegraDeNegocioException {
+        return fotoRepository.findById(idPerfil)
+                .orElseThrow(() -> new RegraDeNegocioException("Imagem não encontrada!"));
     }
 }

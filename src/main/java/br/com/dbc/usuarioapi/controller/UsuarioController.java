@@ -1,34 +1,24 @@
 package br.com.dbc.usuarioapi.controller;
 
-import br.com.dbc.usuarioapi.dto.LoginDTO;
-import br.com.dbc.usuarioapi.dto.PageDTO;
-import br.com.dbc.usuarioapi.dto.UsuarioCreateDTO;
-import br.com.dbc.usuarioapi.dto.UsuarioDTO;
+import br.com.dbc.usuarioapi.dto.*;
 import br.com.dbc.usuarioapi.exception.RegraDeNegocioException;
-import br.com.dbc.usuarioapi.service.FotoService;
 import br.com.dbc.usuarioapi.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.IOException;
 
 
 @RestController
 @RequestMapping("/usuario")
 @RequiredArgsConstructor
 public class UsuarioController {
-
-    private final FotoService fotoService;
     private final UsuarioService usuarioService;
-
 
     @Operation(summary = "Realizar login", description = "Realiza o login do usuário")
     @ApiResponses(
@@ -86,16 +76,19 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Atualizar imagem de perfil", description = "Atualiza a imagem de perfil do usuário")
+    @Operation(summary = "Atualizar cargos", description = "Atualiza os cargos do usuário")
     @ApiResponses(
             value = {
-                    @ApiResponse(responseCode = "200", description = "Imagem atualizada com sucesso"),
+                    @ApiResponse(responseCode = "200", description = "Cargos atualizados com sucesso"),
                     @ApiResponse(responseCode = "403", description = "Você não tem permissão para acessar este recurso"),
                     @ApiResponse(responseCode = "500", description = "Foi gerada uma exceção")
             }
     )
-    @PutMapping(value = "/upload-image-perfil", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<UsuarioDTO> uploadImagePerfil(@Valid @RequestPart("imagem") MultipartFile imagem) throws RegraDeNegocioException, IOException {
-        return new ResponseEntity<>(fotoService.uploadImagePerfil(imagem), HttpStatus.OK);
+    @PutMapping(value = "/update-cargos/{idUsuario}")
+    public ResponseEntity<UsuarioDTO> updateCargos(@Valid @PathVariable("idUsuario") Integer idUsuario,
+                                                   @Valid @RequestBody CargoUpdateDTO cargoUpdateDTO) throws RegraDeNegocioException {
+        UsuarioDTO usuarioDTO = usuarioService.updateCargos(idUsuario, cargoUpdateDTO);
+
+        return new ResponseEntity<>(usuarioDTO, HttpStatus.OK);
     }
 }
