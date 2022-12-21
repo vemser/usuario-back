@@ -38,19 +38,19 @@ public class UsuarioService {
         login.setUsername(loginValidado);
 
         CredenciaisDTO credenciaisDTO = gerarCredenciais(login);
-        TokenDTO token;
+        ResponseEcosDTO response;
         try {
-            token = (usuarioClient.post(credenciaisDTO));
+            response = (usuarioClient.post(credenciaisDTO));
         }catch(Exception e) {
             throw new RegraDeNegocioException("login e senha inválidos!");
         }
         UsuarioEntity usuarioEntity;
         try {
-            usuarioEntity = findByLogin(token.getUsername());
+            usuarioEntity = findByLogin(response.getUsername());
         } catch (RegraDeNegocioException e) {
             UsuarioEntity usuarioEntity1 = new UsuarioEntity();
             usuarioEntity1.setCargos(Collections.emptySet());
-            usuarioEntity1.setLogin(token.getUsername());
+            usuarioEntity1.setLogin(response.getUsername());
             usuarioEntity1.setFoto(null);
             usuarioEntity = usuarioRepository.save(usuarioEntity1);
         }

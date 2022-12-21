@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class TokenDTO {
+public class ResponseEcosDTO {
     private String access_token;
 
     private Integer expires_in;

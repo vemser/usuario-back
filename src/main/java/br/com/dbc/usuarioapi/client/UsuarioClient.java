@@ -1,7 +1,7 @@
 package br.com.dbc.usuarioapi.client;
 
 import br.com.dbc.usuarioapi.dto.CredenciaisDTO;
-import br.com.dbc.usuarioapi.dto.TokenDTO;
+import br.com.dbc.usuarioapi.dto.ResponseEcosDTO;
 import feign.Headers;
 import feign.RequestLine;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -13,5 +13,5 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface UsuarioClient {
 
     @RequestLine("POST /token")
-    TokenDTO post(CredenciaisDTO credenciais);
+    ResponseEcosDTO post(CredenciaisDTO credenciais);
 }
