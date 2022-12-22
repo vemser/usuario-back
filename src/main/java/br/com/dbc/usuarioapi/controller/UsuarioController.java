@@ -117,7 +117,7 @@ public class UsuarioController {
     )
     @GetMapping("/filtro-login-cargo")
     public ResponseEntity<PageDTO<UsuarioDTO>> filtrarLoginCargo(Integer pagina, Integer tamanho,
-                                                                 CargoLoginDTO nomeCargo) {
+                                                                 CargoLoginDTO nomeCargo) throws RegraDeNegocioException {
         return ResponseEntity.ok(usuarioService.filtrar(pagina,tamanho,nomeCargo));
     }
 }

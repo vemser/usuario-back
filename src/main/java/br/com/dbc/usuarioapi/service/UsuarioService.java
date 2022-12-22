@@ -180,8 +180,15 @@ public class UsuarioService {
         return credenciais;
     }
 
-    public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, CargoLoginDTO cargoLogin){
+    public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, CargoLoginDTO cargoLogin) throws RegraDeNegocioException {
         PageRequest pageRequest = PageRequest.of(pagina, tamanho);
+
+        Set<CargoCreateDTO> validar = cargoLogin.getNomes().stream()
+                        .map(x -> new CargoCreateDTO(x, null)).collect(Collectors.toSet());
+
+        if (!cargoValido(validar)){
+            throw new RegraDeNegocioException("Cargo(s) invalido(s)");
+        }
 
         if (cargoLogin.getNomes() == null){
             cargoLogin.setNomes(new ArrayList<>());
@@ -201,15 +208,6 @@ public class UsuarioService {
                 tamanho,
                 usuarioDTOList);
     }
-
-    public static String removeLastCharacter(String str) {
-        String result = Optional.ofNullable(str)
-                .filter(sStr -> sStr.length() != 0)
-                .map(sStr -> sStr.substring(0, sStr.length() - 1))
-                .orElse(str);
-        return result;
-    }
-
 
     @NotNull
     private List<UsuarioDTO> getUsuarioDtos(Page<UsuarioEntity> usuarioEntities) {
