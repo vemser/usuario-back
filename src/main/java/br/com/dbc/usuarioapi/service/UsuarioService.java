@@ -183,18 +183,18 @@ public class UsuarioService {
     public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, CargoLoginDTO cargoLogin) throws RegraDeNegocioException {
         PageRequest pageRequest = PageRequest.of(pagina, tamanho);
 
-        Set<CargoCreateDTO> validar = cargoLogin.getNomes().stream()
-                        .map(x -> new CargoCreateDTO(x, null)).collect(Collectors.toSet());
-
-        if (!cargoValido(validar)){
-            throw new RegraDeNegocioException("Cargo(s) invalido(s)");
-        }
-
         if (cargoLogin.getNomes() == null){
             cargoLogin.setNomes(new ArrayList<>());
             cargoLogin.getNomes().add("ROLE_ADMIN");
             cargoLogin.getNomes().add("ROLE_INSTRUTOR");
             cargoLogin.getNomes().add("ROLE_GESTAO_DE_PESSOAS");
+        }
+
+        Set<CargoCreateDTO> validar = cargoLogin.getNomes().stream()
+                .map(x -> new CargoCreateDTO(x, null)).collect(Collectors.toSet());
+
+        if (!cargoValido(validar)){
+            throw new RegraDeNegocioException("Cargo(s) invalido(s)");
         }
 
         Page<UsuarioEntity> usuarioEntityPage = usuarioRepository
