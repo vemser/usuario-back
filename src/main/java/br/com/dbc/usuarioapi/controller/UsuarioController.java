@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/usuario")
@@ -116,8 +117,8 @@ public class UsuarioController {
     )
     @GetMapping("/filtro-login-cargo")
     public ResponseEntity<PageDTO<UsuarioDTO>> filtrarLoginCargo(Integer pagina, Integer tamanho,
-                                                                 @RequestBody CargoNomeCreateDTO nomeCargo){
-                                                                 @RequestParam(name = "login", required = false) String login,
-        return ResponseEntity.ok(usuarioService.filtrar(pagina,tamanho,login,nomeCargo));
+                                                                 @RequestParam (name = "nomeCargo", required = false) List<String> nomeCargo,
+                                                                 @RequestParam(name = "login", required = false) String login) {
+        return ResponseEntity.ok(usuarioService.filtrar(pagina,tamanho,nomeCargo,login));
     }
 }

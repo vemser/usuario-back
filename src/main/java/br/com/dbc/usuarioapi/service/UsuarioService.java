@@ -181,23 +181,23 @@ public class UsuarioService {
         return credenciais;
     }
 
-    public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, String login, CargoNomeCreateDTO nomeCargo){
+    public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, List<String> nomeCargo, String login){
         PageRequest pageRequest = PageRequest.of(pagina, tamanho);
 
-        String stringNomeCargo = "";
-
-        for (String nome : nomeCargo.getNome()) {
-            stringNomeCargo += nome + ",";
-        }
-
-        if(nomeCargo != null){
-            stringNomeCargo = removeLastCharacter(stringNomeCargo);
-        }else{
-            stringNomeCargo = null;
-        }
+//        String stringNomeCargo = "";
+//
+//        for (String nome : nomeCargo) {
+//            stringNomeCargo += nome + ",";
+//        }
+//
+//        if(nomeCargo != null){
+//            stringNomeCargo = removeLastCharacter(stringNomeCargo);
+//        }else{
+//            stringNomeCargo = null;
+//        }
 
         Page<UsuarioEntity> usuarioEntityPage = usuarioRepository
-                .findAllByFiltro(pageRequest, login, stringNomeCargo);
+                .findAllByFiltro(pageRequest, login, /*stringNomeCargo*/nomeCargo);
 
         List<UsuarioDTO> usuarioDTOList = getUsuarioDtos(usuarioEntityPage);
 
