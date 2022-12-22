@@ -85,7 +85,7 @@ public class UsuarioController {
             }
     )
     @DeleteMapping("/{idUsuario}")
-    public ResponseEntity<Void> delete(@Valid @PathVariable("idUsuario") Integer idUsuario) throws RegraDeNegocioException {
+    public ResponseEntity<Void> delete(@PathVariable("idUsuario") Integer idUsuario) throws RegraDeNegocioException {
         usuarioService.delete(idUsuario);
         return ResponseEntity.noContent().build();
     }
@@ -99,7 +99,7 @@ public class UsuarioController {
             }
     )
     @PutMapping(value = "/update-cargos/{idUsuario}")
-    public ResponseEntity<UsuarioDTO> updateCargos(@Valid @PathVariable("idUsuario") Integer idUsuario,
+    public ResponseEntity<UsuarioDTO> updateCargos(@PathVariable("idUsuario") Integer idUsuario,
                                                    @Valid @RequestBody CargoUpdateDTO cargoUpdateDTO) throws RegraDeNegocioException {
         UsuarioDTO usuarioDTO = usuarioService.updateCargos(idUsuario, cargoUpdateDTO);
 
@@ -117,7 +117,7 @@ public class UsuarioController {
     @GetMapping("/filtrarLoginCargo")
     public ResponseEntity<PageDTO<UsuarioDTO>> filtrarLoginCargo(Integer pagina, Integer tamanho,
                                                                  @RequestParam(name = "login", required = false) String login,
-                                                                 @RequestParam(name = "nomeCargo", required = false) String nomeCargo){
+                                                                 @RequestBody CargoNomeCreateDTO nomeCargo){
         return ResponseEntity.ok(usuarioService.filtrar(pagina,tamanho,login,nomeCargo));
     }
 }

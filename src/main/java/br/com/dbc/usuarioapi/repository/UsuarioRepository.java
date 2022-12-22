@@ -22,10 +22,9 @@ public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Integer>
            "from USUARIO obj " +
            "inner JOIN obj.cargos c " +
            "WHERE (:login is null or UPPER(obj.login) LIKE UPPER(concat('%', :login, '%'))) AND " +
-           "(:nomeCargo is null or UPPER(c.nome) LIKE UPPER(concat('%',:nomeCargo, '%'))) " +
+           "(:nomeCargo is null or UPPER(c.nome) in (:nomeCargo)) " +
            "ORDER BY obj.login ")
    Page<UsuarioEntity> findAllByFiltro(Pageable pageable, String login, String nomeCargo);
 
-//   Page<UsuarioEntity> findUsuarioEntityByLoginOrCargos(Pageable pageable, String login, Set<CargoEntity> cargoEntitySet);
 
 }

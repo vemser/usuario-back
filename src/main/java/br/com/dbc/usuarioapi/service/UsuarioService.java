@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
+import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -181,12 +181,23 @@ public class UsuarioService {
         return credenciais;
     }
 
-    public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, String login, String nomeCargo){
+    public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, String login, CargoNomeCreateDTO nomeCargo){
         PageRequest pageRequest = PageRequest.of(pagina, tamanho);
 
+        String stringNomeCargo = "";
+
+        for (String nome : nomeCargo.getNome()) {
+            stringNomeCargo += nome + ",";
+        }
+
+        if(nomeCargo != null){
+            stringNomeCargo = removeLastCharacter(stringNomeCargo);
+        }else{
+            stringNomeCargo = null;
+        }
 
         Page<UsuarioEntity> usuarioEntityPage = usuarioRepository
-                .findAllByFiltro(pageRequest, login, nomeCargo);
+                .findAllByFiltro(pageRequest, login, stringNomeCargo);
 
         List<UsuarioDTO> usuarioDTOList = getUsuarioDtos(usuarioEntityPage);
 
@@ -195,7 +206,14 @@ public class UsuarioService {
                 pagina,
                 tamanho,
                 usuarioDTOList);
+    }
 
+    public static String removeLastCharacter(String str) {
+        String result = Optional.ofNullable(str)
+                .filter(sStr -> sStr.length() != 0)
+                .map(sStr -> sStr.substring(0, sStr.length() - 1))
+                .orElse(str);
+        return result;
     }
 
 
