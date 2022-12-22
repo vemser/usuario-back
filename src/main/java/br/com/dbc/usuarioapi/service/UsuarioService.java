@@ -215,15 +215,7 @@ public class UsuarioService {
     private List<UsuarioDTO> getUsuarioDtos(Page<UsuarioEntity> usuarioEntities) {
         List<UsuarioDTO> usuarioDTOList = usuarioEntities
                 .getContent().stream()
-                .map(usuarioEntity -> {
-                            UsuarioDTO usuarioDTO = objectMapper.convertValue(usuarioEntity, UsuarioDTO.class);
-
-                            usuarioDTO.setCargos(usuarioEntity.getCargos().stream()
-                                    .map(cargo -> objectMapper.convertValue(cargo, CargoDTO.class))
-                                    .collect(Collectors.toSet()));
-
-                            return usuarioDTO;
-                        })
+                .map(this::toDto)
                 .collect(Collectors.toList());
         return usuarioDTOList;
     }
