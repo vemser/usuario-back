@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -181,23 +180,18 @@ public class UsuarioService {
         return credenciais;
     }
 
-    public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, List<String> nomeCargo, String login){
+    public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, CargoLoginDTO cargoLogin){
         PageRequest pageRequest = PageRequest.of(pagina, tamanho);
 
-//        String stringNomeCargo = "";
-//
-//        for (String nome : nomeCargo) {
-//            stringNomeCargo += nome + ",";
-//        }
-//
-//        if(nomeCargo != null){
-//            stringNomeCargo = removeLastCharacter(stringNomeCargo);
-//        }else{
-//            stringNomeCargo = null;
-//        }
+        if (cargoLogin.getNomes() == null){
+            cargoLogin.setNomes(new ArrayList<>());
+            cargoLogin.getNomes().add("ROLE_ADMIN");
+            cargoLogin.getNomes().add("ROLE_INSTRUTOR");
+            cargoLogin.getNomes().add("ROLE_GESTAO_DE_PESSOAS");
+        }
 
         Page<UsuarioEntity> usuarioEntityPage = usuarioRepository
-                .findAllByFiltro(pageRequest, login, /*stringNomeCargo*/nomeCargo);
+                .findAllByFiltro(pageRequest, cargoLogin.getLogin(), cargoLogin.getNomes());
 
         List<UsuarioDTO> usuarioDTOList = getUsuarioDtos(usuarioEntityPage);
 

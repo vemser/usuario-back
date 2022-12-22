@@ -5,7 +5,8 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CargoNomeCreateDTO {
+public class CargoLoginDTO {
 
-    private List<String> nome;
+    private List<String> nomes;
+    private String login;
 }

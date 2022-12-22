@@ -117,8 +117,7 @@ public class UsuarioController {
     )
     @GetMapping("/filtro-login-cargo")
     public ResponseEntity<PageDTO<UsuarioDTO>> filtrarLoginCargo(Integer pagina, Integer tamanho,
-                                                                 @RequestParam (name = "nomeCargo", required = false) List<String> nomeCargo,
-                                                                 @RequestParam(name = "login", required = false) String login) {
-        return ResponseEntity.ok(usuarioService.filtrar(pagina,tamanho,nomeCargo,login));
+                                                                 CargoLoginDTO nomeCargo) {
+        return ResponseEntity.ok(usuarioService.filtrar(pagina,tamanho,nomeCargo));
     }
 }
