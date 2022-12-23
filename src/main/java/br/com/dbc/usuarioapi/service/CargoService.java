@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,9 @@ public class CargoService {
         return objectMapper.convertValue(cargoEntity, CargoDTO.class);
     }
 
+    public List<CargoEntity> list() {
+        return cargoRepository.findAll();
+    }
     public Set<CargoDTO> toDtos(Set<CargoEntity> cargos) {
         return cargos.stream()
                 .map(cargoEntity -> toDto(cargoEntity))

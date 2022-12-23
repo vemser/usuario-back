@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,13 @@ public class UsuarioService {
     private final UsuarioClient usuarioClient;
     private final TokenService tokenService;
     private final LoginService loginService;
+
+    @Value("${credentials.client-id}")
+    private String clientId;
+    @Value("${credentials.client-secret}")
+    private String clientSecret;
+    @Value("${credentials.grant-type}")
+    private String grantType;
 
     public UsuarioDTO buscarUsuarioLogado() throws RegraDeNegocioException {
         UsuarioDTO loggedUser = loginService.getLoggedUser();
@@ -76,9 +84,9 @@ public class UsuarioService {
         Optional<UsuarioEntity> byLogin = usuarioRepository.findByLogin(usuarioCreateDTO.getLogin());
         if (byLogin.isPresent()) {
             throw new RegraDeNegocioException("Login informado já existe!");
-        }else if (!cargoValido(usuarioCreateDTO.getCargos())){
-            throw new RegraDeNegocioException("Insira um cargo válido!");
         }
+
+        validarCargos(usuarioCreateDTO.getCargos());
         UsuarioEntity usuarioEntity = new UsuarioEntity();
         usuarioEntity.setLogin(usuarioCreateDTO.getLogin());
 
@@ -92,9 +100,7 @@ public class UsuarioService {
     }
 
     public UsuarioDTO updateCargos(Integer id, CargoUpdateDTO cargoUpdate) throws RegraDeNegocioException {
-        if (!cargoValido(cargoUpdate.getCargos())) {
-            throw new RegraDeNegocioException("Insira um cargo válido!");
-        }
+        validarCargos(cargoUpdate.getCargos());
 
         UsuarioEntity usuarioRecover = findById(id);
         Set<CargoEntity> cargos = cargoUpdate.getCargos().stream()
@@ -109,26 +115,21 @@ public class UsuarioService {
         usuarioRepository.delete(usuarioEntity);
     }
 
-    public boolean cargoValido(Set<CargoCreateDTO> cargoEntities) {
+    public void validarCargos(Set<CargoCreateDTO> cargosUsuario) throws RegraDeNegocioException {
+        List<CargoEntity> cargosBanco = cargoService.list();
+        List<String> nomesCargos = cargosBanco.stream()
+                .map(CargoEntity::getNome)
+                .toList();
+        boolean equals = true;
 
-        String admin = "ROLE_ADMIN";
-        String coordenador = "ROLE_GESTOR";
-        String gestao = "ROLE_GESTAO_DE_PESSOAS";
-        String instrutor = "ROLE_INSTRUTOR";
-        String aluno = "ROLE_ALUNO";
-        String colaborador = "ROLE_COLABORADOR";
-
-        for (CargoCreateDTO cargo : cargoEntities) {
-            if (!Objects.equals(cargo.getNome().trim(), admin) &&
-                    !Objects.equals(cargo.getNome().trim(), coordenador) &&
-                    !Objects.equals(cargo.getNome().trim(), gestao) &&
-                    !Objects.equals(cargo.getNome().trim(), instrutor) &&
-                    !Objects.equals(cargo.getNome().trim(), aluno) &&
-                    !Objects.equals(cargo.getNome().trim(), colaborador)) {
-                return false;
+        for(CargoCreateDTO cargoUsuario : cargosUsuario) {
+            if(!nomesCargos.contains(cargoUsuario.getNome())) {
+                equals = false;
             }
         }
-        return true;
+        if(!equals) {
+            throw new RegraDeNegocioException("Cargo inválido!");
+        }
     }
 
     public UsuarioEntity findById(Integer idUsuario) throws RegraDeNegocioException {
@@ -172,9 +173,9 @@ public class UsuarioService {
 
     private CredenciaisDTO gerarCredenciais(LoginDTO login) {
         CredenciaisDTO credenciais = new CredenciaisDTO();
-        credenciais.setClient_id("ECOS-Client");
-        credenciais.setClient_secret("DBC-ECOS");
-        credenciais.setGrant_type("password");
+        credenciais.setClient_id(clientId);
+        credenciais.setClient_secret(clientSecret);
+        credenciais.setGrant_type(grantType);
         credenciais.setUsername(login.getUsername());
         credenciais.setPassword(login.getPassword());
         return credenciais;
@@ -193,9 +194,7 @@ public class UsuarioService {
         Set<CargoCreateDTO> validar = cargoLogin.getNomes().stream()
                 .map(x -> new CargoCreateDTO(x, null)).collect(Collectors.toSet());
 
-        if (!cargoValido(validar)){
-            throw new RegraDeNegocioException("Cargo(s) invalido(s)");
-        }
+        validarCargos(validar);
 
         Page<UsuarioEntity> usuarioEntityPage = usuarioRepository
                 .findAllByFiltro(pageRequest, cargoLogin.getLogin(), cargoLogin.getNomes());
