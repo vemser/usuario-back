@@ -23,4 +23,6 @@ public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Integer>
            " (UPPER(c.nome) IN (:nomeCargo)) " +
            " ORDER BY obj.login ")
    Page<UsuarioEntity> findAllByFiltro(Pageable pageable, String login, List<String> nomeCargo);
+
+   Page<UsuarioEntity> findUsuariosEntitiesByLoginContainingIgnoreCase(Pageable pageable, String login);
 }

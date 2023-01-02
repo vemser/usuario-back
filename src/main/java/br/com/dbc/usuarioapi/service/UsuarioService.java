@@ -184,20 +184,24 @@ public class UsuarioService {
     public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, CargoLoginDTO cargoLogin) throws RegraDeNegocioException {
         PageRequest pageRequest = PageRequest.of(pagina, tamanho);
 
+        Page<UsuarioEntity> usuarioEntityPage;
+
         if (cargoLogin.getNomes() == null){
-            cargoLogin.setNomes(new ArrayList<>());
-            cargoLogin.getNomes().add("ROLE_ADMIN");
-            cargoLogin.getNomes().add("ROLE_INSTRUTOR");
-            cargoLogin.getNomes().add("ROLE_GESTAO_DE_PESSOAS");
+//            cargoLogin.setNomes(new ArrayList<>());
+//            cargoLogin.getNomes().add("ROLE_ADMIN");
+//            cargoLogin.getNomes().add("ROLE_INSTRUTOR");
+//            cargoLogin.getNomes().add("ROLE_GESTAO_DE_PESSOAS");
+            usuarioEntityPage = usuarioRepository
+                    .findUsuariosEntitiesByLoginContainingIgnoreCase(pageRequest, cargoLogin.getLogin());
+        }else {
+            Set<CargoCreateDTO> validar = cargoLogin.getNomes().stream()
+                    .map(x -> new CargoCreateDTO(x, null)).collect(Collectors.toSet());
+
+            validarCargos(validar);
+
+            usuarioEntityPage = usuarioRepository
+                    .findAllByFiltro(pageRequest, cargoLogin.getLogin(), cargoLogin.getNomes());
         }
-
-        Set<CargoCreateDTO> validar = cargoLogin.getNomes().stream()
-                .map(x -> new CargoCreateDTO(x, null)).collect(Collectors.toSet());
-
-        validarCargos(validar);
-
-        Page<UsuarioEntity> usuarioEntityPage = usuarioRepository
-                .findAllByFiltro(pageRequest, cargoLogin.getLogin(), cargoLogin.getNomes());
 
         List<UsuarioDTO> usuarioDTOList = getUsuarioDtos(usuarioEntityPage);
 
