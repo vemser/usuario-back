@@ -193,8 +193,9 @@ public class UsuarioService {
 
         Set<CargoCreateDTO> validar = cargoLogin.getNomes().stream()
                 .map(x -> new CargoCreateDTO(x, null)).collect(Collectors.toSet());
-
         validarCargos(validar);
+
+        cargoLogin.getNomes().add("");
 
         Page<UsuarioEntity> usuarioEntityPage = usuarioRepository
                 .findAllByFiltro(pageRequest, cargoLogin.getLogin(), cargoLogin.getNomes());
