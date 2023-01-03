@@ -146,12 +146,6 @@ public class UsuarioService {
         return objectMapper.convertValue(usuarioRepository.save(usuario), UsuarioDTO.class);
     }
 
-    private UsuarioEntity toEntity(UsuarioDTO usuario) {
-        UsuarioEntity usuarioEntity = objectMapper.convertValue(usuario, UsuarioEntity.class);
-        usuarioEntity.setCargos(cargoService.toEntities(usuario.getCargos()));
-        return usuarioEntity;
-    }
-
     private UsuarioDTO toDto(UsuarioEntity usuario) {
         UsuarioDTO usuarioDTO = objectMapper.convertValue(usuario, UsuarioDTO.class);
         usuarioDTO.setCargos(cargoService.toDtos(usuario.getCargos()));
@@ -187,12 +181,8 @@ public class UsuarioService {
         Page<UsuarioEntity> usuarioEntityPage;
 
         if (cargoLogin.getNomes() == null){
-//            cargoLogin.setNomes(new ArrayList<>());
-//            cargoLogin.getNomes().add("ROLE_ADMIN");
-//            cargoLogin.getNomes().add("ROLE_INSTRUTOR");
-//            cargoLogin.getNomes().add("ROLE_GESTAO_DE_PESSOAS");
             usuarioEntityPage = usuarioRepository
-                    .findUsuariosEntitiesByLoginContainingIgnoreCase(pageRequest, cargoLogin.getLogin());
+                    .findUsuariosByLoginContainingIgnoreCaseOrderByLogin(pageRequest, cargoLogin.getLogin());
         }else {
             Set<CargoCreateDTO> validar = cargoLogin.getNomes().stream()
                     .map(x -> new CargoCreateDTO(x, null)).collect(Collectors.toSet());
