@@ -3,7 +3,6 @@ package br.com.dbc.usuarioapi.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,11 +28,12 @@ public class SecurityConfiguration {
                 .frameOptions().disable()
                 .and().cors()
                 .and().csrf().disable()
-                .authorizeHttpRequests((auth) -> auth.antMatchers("/", "/usuario/login").permitAll()
-                        .antMatchers(HttpMethod.PUT,"/usuario/update-cargos/**").hasAnyRole("ADMIN")
-                        .antMatchers(HttpMethod.GET, "/usuario").hasRole("ADMIN")
-                        .antMatchers(HttpMethod.POST, "/usuario").hasRole("ADMIN")
-                        .antMatchers(HttpMethod.DELETE, "/usuario/**").hasRole("ADMIN")
+//                .authorizeHttpRequests((auth) -> auth.antMatchers("/", "/usuario/login").permitAll()
+                .authorizeHttpRequests((auth) -> auth.antMatchers("/**").permitAll()
+//                        .antMatchers(HttpMethod.PUT,"/usuario/update-cargos/**").hasAnyRole("ADMIN")
+//                        .antMatchers(HttpMethod.GET, "/usuario").hasRole("ADMIN")
+//                        .antMatchers(HttpMethod.POST, "/usuario").hasRole("ADMIN")
+//                        .antMatchers(HttpMethod.DELETE, "/usuario/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 );
         http.addFilterBefore(new TokenAuthenticationFilter(tokenService), UsernamePasswordAuthenticationFilter.class);
