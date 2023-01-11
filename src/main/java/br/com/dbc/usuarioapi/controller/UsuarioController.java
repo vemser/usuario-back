@@ -13,7 +13,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/usuario")
@@ -31,7 +30,7 @@ public class UsuarioController {
             }
     )
     @GetMapping("/logged-user")
-    public ResponseEntity <UsuarioDTO> getLoggedUser() throws RegraDeNegocioException {
+    public ResponseEntity<UsuarioDTO> getLoggedUser() throws RegraDeNegocioException {
         return new ResponseEntity<>(usuarioService.buscarUsuarioLogado(), HttpStatus.OK);
     }
 
@@ -110,7 +109,7 @@ public class UsuarioController {
     @Operation(summary = "Filtar por login e cargo", description = "Filtar por login e cargo do usuário")
     @ApiResponses(
             value = {
-                    @ApiResponse(responseCode = "200", description = "Cargos atualizados com sucesso"),
+                    @ApiResponse(responseCode = "200", description = "Filtrado com sucesso"),
                     @ApiResponse(responseCode = "403", description = "Você não tem permissão para acessar este recurso"),
                     @ApiResponse(responseCode = "500", description = "Foi gerada uma exceção")
             }
@@ -118,6 +117,22 @@ public class UsuarioController {
     @GetMapping("/filtro-login-cargo")
     public ResponseEntity<PageDTO<UsuarioDTO>> filtrarLoginCargo(Integer pagina, Integer tamanho,
                                                                  CargoLoginDTO nomeCargo) throws RegraDeNegocioException {
-        return ResponseEntity.ok(usuarioService.filtrar(pagina,tamanho,nomeCargo));
+        return ResponseEntity.ok(usuarioService.filtrar(pagina, tamanho, nomeCargo));
     }
+
+    @Operation(summary = "Filtar por login e cargo", description = "Filtar por login e cargo do usuário")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Usuario encontrado com sucesso"),
+                    @ApiResponse(responseCode = "403", description = "Você não tem permissão para acessar este recurso"),
+                    @ApiResponse(responseCode = "500", description = "Foi gerada uma exceção")
+            }
+    )
+    @GetMapping("/filtro-usuario-login-cargo")
+    public ResponseEntity<PageDTO<UsuarioFiltroDTO>> filtrarUsuarioPorLoginCargo(Integer pagina, Integer tamanho,
+                                                                                 CargoLoginDTO nomeCargo) throws RegraDeNegocioException {
+        return ResponseEntity.ok(usuarioService.filtroUsuarioNomeCargo(pagina, tamanho, nomeCargo));
+    }
+
+
 }

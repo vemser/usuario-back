@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -122,12 +123,12 @@ public class UsuarioService {
                 .toList();
         boolean equals = true;
 
-        for(CargoCreateDTO cargoUsuario : cargosUsuario) {
-            if(!nomesCargos.contains(cargoUsuario.getNome())) {
+        for (CargoCreateDTO cargoUsuario : cargosUsuario) {
+            if (!nomesCargos.contains(cargoUsuario.getNome())) {
                 equals = false;
             }
         }
-        if(!equals) {
+        if (!equals) {
             throw new RegraDeNegocioException("Cargo inválido!");
         }
     }
@@ -155,7 +156,7 @@ public class UsuarioService {
     }
 
     private String validarLogin(String login) throws RegraDeNegocioException {
-        if(login.trim().contains("@")) {
+        if (login.trim().contains("@")) {
             if (login.trim().endsWith("@dbccompany.com.br")) {
                 login = login.trim().replace("@dbccompany.com.br", "");
             } else {
@@ -175,15 +176,47 @@ public class UsuarioService {
         return credenciais;
     }
 
+    public PageDTO<UsuarioFiltroDTO> filtroUsuarioNomeCargo(Integer pagina, Integer tamanho, CargoLoginDTO cargoLogin) throws RegraDeNegocioException {
+        PageRequest pageRequest = PageRequest.of(pagina, tamanho);
+
+        Page<UsuarioEntity> usuarioEntityPage;
+
+        if (cargoLogin.getNomes() == null) {
+            usuarioEntityPage = usuarioRepository
+                    .findUsuariosByLoginContainingIgnoreCaseOrderByLogin(pageRequest, cargoLogin.getLogin());
+        } else {
+            Set<CargoCreateDTO> validar = cargoLogin.getNomes().stream()
+                    .map(x -> new CargoCreateDTO(x, null)).collect(Collectors.toSet());
+
+            validarCargos(validar);
+
+            usuarioEntityPage = usuarioRepository
+                    .findAllByFiltro(pageRequest, cargoLogin.getLogin(), cargoLogin.getNomes());
+        }
+
+        List<UsuarioFiltroDTO> usuarioDTOList = new ArrayList<>();
+        for (UsuarioEntity usuario : usuarioEntityPage) {
+            UsuarioFiltroDTO usuarioFiltroDTO = objectMapper.convertValue(usuario, UsuarioFiltroDTO.class);
+            usuarioFiltroDTO.setCargos(cargoService.toDtos(usuario.getCargos()));
+            usuarioDTOList.add(usuarioFiltroDTO);
+        }
+
+        return new PageDTO<>(usuarioEntityPage.getTotalElements(),
+                usuarioEntityPage.getTotalPages(),
+                pagina,
+                tamanho,
+                usuarioDTOList);
+    }
+
     public PageDTO<UsuarioDTO> filtrar(Integer pagina, Integer tamanho, CargoLoginDTO cargoLogin) throws RegraDeNegocioException {
         PageRequest pageRequest = PageRequest.of(pagina, tamanho);
 
         Page<UsuarioEntity> usuarioEntityPage;
 
-        if (cargoLogin.getNomes() == null){
+        if (cargoLogin.getNomes() == null) {
             usuarioEntityPage = usuarioRepository
                     .findUsuariosByLoginContainingIgnoreCaseOrderByLogin(pageRequest, cargoLogin.getLogin());
-        }else {
+        } else {
             Set<CargoCreateDTO> validar = cargoLogin.getNomes().stream()
                     .map(x -> new CargoCreateDTO(x, null)).collect(Collectors.toSet());
 
