@@ -29,7 +29,7 @@ start 1;
 CREATE TABLE usuario_cargo
 (
     id_usuario numeric NOT NULL,
-    id_cargo numeric unique NOT NULL,
+    id_cargo numeric NOT NULL,
     PRIMARY KEY (id_usuario, id_cargo),
     CONSTRAINT FK_usuario_cargo_usuario FOREIGN KEY (id_usuario)
         REFERENCES usuario (id_usuario),
