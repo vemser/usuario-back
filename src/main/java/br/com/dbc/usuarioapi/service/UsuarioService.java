@@ -46,7 +46,6 @@ public class UsuarioService {
     }
 
     public String post(LoginDTO login) throws RegraDeNegocioException {
-        log.info("LOGIN: {}", login.toString());
         String loginValidado = validarLogin(login.getUsername());
         login.setUsername(loginValidado);
 
